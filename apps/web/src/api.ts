@@ -8,7 +8,7 @@ export const catApi = createApi({
       getAll: builder.query<Array<CatDto>, void>({
         query: () => ``,
       }),
-      get: builder.query<Array<CatDto>, number>({
+      get: builder.query<CatDto, number>({
         query: (id) => `${id}`,
       }),
       create: builder.mutation<number, CatDto>({
