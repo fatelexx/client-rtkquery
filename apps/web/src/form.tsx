@@ -1,13 +1,30 @@
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useCreateMutation, useGetQuery, useUpdateMutation } from "./api"
+import { CatDto } from "@client-rtkquery/dto";
+import { useEffect } from "react";
 
 type Props = {
     id?: number;
 }
 
+type FormType = {
+    firstName: string;
+    lastName: string;
+    birthday: string;
+}
+
 export default function Form({ id }: Props) {
     const { data: cat, isLoading: isGetLoading, error: getError } = useGetQuery(id ?? 0);
     const [create, { isLoading: isCreateLoading, error: createError }] = useCreateMutation();
-    const [update, { isLoading: isUpdateLoading, error: updateError}] = useUpdateMutation();
+    const [update, { isLoading: isUpdateLoading, error: updateError }] = useUpdateMutation();
+
+    const { register, handleSubmit, reset } = useForm<FormType>();
+
+    useEffect(() => {
+        if (cat) {
+            reset({ ...cat, birthday: cat?.birthday ? new Date(cat.birthday).toLocaleDateString('en') : new Date().toLocaleDateString() });
+        }
+    }, [cat, reset]);
 
     if (isGetLoading || isCreateLoading || isUpdateLoading) {
         return <h1>Loading...</h1>
@@ -17,16 +34,20 @@ export default function Form({ id }: Props) {
         return <h1>Cannot fetch cat</h1>
     }
 
-    const handle = async () => {
-        id ? await update({id, firstName: 'puss', lastName: 'ahh', birthday: new Date('11/22/2023')}) : 
-        await create({ firstName: 'dashu', lastName: 'catsu', birthday: new Date('8/12/2023'), id: 1 });
+    const handle: SubmitHandler<FormType> = async (data) => {
+        const cat: CatDto = {...data, birthday: new Date(data.birthday), id: id ?? 0};
+        id ? await update(cat) :
+            await create(cat);
     }
 
     return (
-        <>
+        <form onSubmit={handleSubmit(handle)}>
             {(createError || updateError) && <span>{'may error hoy'}</span>}
-            <button onClick={handle}>Add New</button>
-            <textarea value={JSON.stringify(cat)}></textarea>
-        </>
+            <input {...register('firstName')} type="text" /> <br />
+            <input {...register('lastName')} type="text" /> <br />
+            <input {...register('birthday')} type="date" /> <br />
+            <button type="submit">Submit</button>
+            {/* <button type="reset" onClick={onCancel}>Cancel</button> */}
+        </form>
     )
 }
