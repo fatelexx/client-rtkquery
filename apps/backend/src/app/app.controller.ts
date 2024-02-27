@@ -20,7 +20,7 @@ export class AppController {
   @Post()
   create(@Body() createCatDto: CatDto) {
     const id = Math.max(...this.cats.map(x => x.id)) + 1;
-    this.cats.push({...createCatDto, id})
+    this.cats.push({ ...createCatDto, id })
     return id;
   }
 
