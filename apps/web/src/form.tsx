@@ -21,9 +21,9 @@ export default function Form({ id }: Props) {
     const { register, handleSubmit, reset } = useForm<FormType>();
 
     useEffect(() => {
-        if (cat) {
+        // if (cat) {
             reset({ ...cat, birthday: cat?.birthday ? new Date(cat.birthday).toLocaleDateString('en') : new Date().toLocaleDateString() });
-        }
+        // }
     }, [cat, reset]);
 
     if (isGetLoading || isCreateLoading || isUpdateLoading) {
