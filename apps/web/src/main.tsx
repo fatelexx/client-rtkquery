@@ -6,7 +6,6 @@ import {
 
 import { catApi } from './api';
 import App from './app';
-import Form from './form';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,7 +14,6 @@ root.render(
   <StrictMode>
     <ApiProvider api={catApi}>
       <App />
-      <Form />
     </ApiProvider>
   </StrictMode>
 );
