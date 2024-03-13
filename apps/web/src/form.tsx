@@ -22,7 +22,7 @@ export default function Form({ id }: Props) {
 
     useEffect(() => {
         // if (cat) {
-            reset({ ...cat, birthday: cat?.birthday ? new Date(cat.birthday).toLocaleDateString('en') : new Date().toLocaleDateString() });
+            reset({ ...cat, birthday: cat?.birthDay ? new Date(cat.birthDay).toLocaleDateString('en') : new Date().toLocaleDateString() });
         // }
     }, [cat, reset]);
 
@@ -35,7 +35,7 @@ export default function Form({ id }: Props) {
     }
 
     const handle: SubmitHandler<FormType> = async (data) => {
-        const cat: CatDto = {...data, birthday: new Date(data.birthday), id: id ?? 0};
+        const cat: CatDto = {...data, birthDay: new Date(data.birthday), id: id ?? 0};
         id ? await update(cat) :
             await create(cat);
     }
