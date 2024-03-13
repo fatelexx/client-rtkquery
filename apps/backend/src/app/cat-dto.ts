@@ -12,6 +12,6 @@ export class CatDto implements Dto {
     lastName: string;
   
     @ApiProperty()
-    birthday: Date;
+    birthDay: Date;
   }
   
