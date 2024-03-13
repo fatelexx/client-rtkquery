@@ -1,62 +1,59 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { CatDto } from './cat-dto';
+import { PrismaService } from '../prisma.service';
 
 @Controller('cats')
 export class AppController {
-  private cats: Array<CatDto> = [
-    {
-      id: 1,
-      firstName: 'diablo',
-      lastName: 'job',
-      birthday: new Date('1/2/2023')
-    }
-  ]
+  constructor(private prisma: PrismaService) {}
 
   @Get()
-  getData() {
-    return this.cats;
+  async getData() {
+    const cats: Array<CatDto> = await this.prisma.cat.findMany();
+    return cats;
   }
 
   @Post()
-  create(@Body() createCatDto: CatDto) {
-    const id = Math.max(...this.cats.map(x => x.id)) + 1;
-    this.cats.push({ ...createCatDto, id })
-    return id;
+  async create(@Body() createCatDto: CatDto) {
+    const cat = await this.prisma.cat.create({
+      data: {
+        firstName: createCatDto.firstName,
+        birthDay: createCatDto.birthDay,
+        lastName: createCatDto.lastName,
+      },
+    })
+    return cat.id;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    console.log(id);
-    const cat = this.cats.find(x => x.id === +id);
-    console.log(cat);
-    // if(!cat) {
-    //   return; 
-    // }
+  async findOne(@Param('id') id: number) {
+    const cat = await this.prisma.cat.findUniqueOrThrow({where: {id: +id}});
     return cat;
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() updateUserDto: CatDto) {
-    const cat = this.cats.find(x => x.id === +id);
-    // if(!cat) {
-    //   return;      
-    // }
-
-    cat.firstName = updateUserDto.firstName;
-    cat.lastName = updateUserDto.lastName;
-    cat.birthday = updateUserDto.birthday;
-
-    return;
+  async update(@Param('id') id: number, @Body() {firstName, lastName, birthDay}: CatDto) {
+    const updateUser = await this.prisma.cat.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        firstName,
+        lastName,
+        birthDay
+      },
+    });
+    console.log(updateUser);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    const cat = this.cats.find(x => x.id === +id);
-    // if(!cat) {
-    //   return;      
-    // }
+  async remove(@Param('id') id: number) {
+    const deleteCats = await this.prisma.cat.deleteMany({
+      where: {
+        id: +id
+      },
+    });
 
-    this.cats.splice(this.cats.indexOf(cat), 1);
+    console.log(deleteCats);
     return;
   }
 }
